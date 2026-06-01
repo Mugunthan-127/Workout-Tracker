@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
+const authRoutes = require("./routes/auth");
+
 const app = express();
 
 /* Middleware */
@@ -12,6 +14,32 @@ app.use(express.json());
 /* Test Route */
 app.get("/", (req, res) => {
     res.send("Workout Tracker API Running");
+});
+
+/* Routes */
+app.use("/api/auth", authRoutes);
+
+/* 404 Error Handler - Invalid Routes */
+app.use((req, res) => {
+    res.status(404).json({ 
+        message: "Route not found",
+        method: req.method,
+        path: req.path,
+        availableEndpoints: {
+            GET: ["/", "/api/auth/user", "/api/auth/all-users"],
+            POST: ["/api/auth/register", "/api/auth/login"],
+            DELETE: ["/api/auth/user"]
+        }
+    });
+});
+
+/* Global Error Handler */
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(err.status || 500).json({ 
+        message: err.message || "Internal Server Error",
+        error: process.env.NODE_ENV === "development" ? err : {}
+    });
 });
 
 /* MongoDB Connection */
