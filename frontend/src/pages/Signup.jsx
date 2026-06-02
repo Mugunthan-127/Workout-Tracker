@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { authAPI } from "../services/api";
 import "../styles/auth.css";
 
 function Signup() {
@@ -12,6 +13,8 @@ function Signup() {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -46,12 +49,26 @@ function Signup() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
 
     e.preventDefault();
 
     if (validateForm()) {
-      alert("Signup Successful");
+      try {
+        setLoading(true);
+        const response = await authAPI.register({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        });
+        
+        alert("Signup Successful! Please login.");
+        navigate("/");
+      } catch (error) {
+        alert(error.response?.data?.message || "Signup failed");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

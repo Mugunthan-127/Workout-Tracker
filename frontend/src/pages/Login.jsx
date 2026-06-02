@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { authAPI } from "../services/api";
 import "../styles/auth.css";
 
 function Login() {
@@ -10,6 +11,8 @@ function Login() {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -35,12 +38,25 @@ function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
 
     e.preventDefault();
 
     if (validateForm()) {
-      alert("Login Successful");
+      try {
+        setLoading(true);
+        const response = await authAPI.login(formData);
+        
+        /* Save token to localStorage */
+        localStorage.setItem("token", response.data.token);
+        
+        alert("Login Successful!");
+        navigate("/dashboard");
+      } catch (error) {
+        alert(error.response?.data?.message || "Login failed");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
