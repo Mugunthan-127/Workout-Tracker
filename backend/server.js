@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
+const workoutRoutes = require("./routes/workouts");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 
 /* Routes */
 app.use("/api/auth", authRoutes);
+app.use("/api/workouts", workoutRoutes);
 
 /* 404 Error Handler - Invalid Routes */
 app.use((req, res) => {
