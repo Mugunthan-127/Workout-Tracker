@@ -5,9 +5,9 @@ const { verifyToken } = require("../middleware/auth");
 const router = express.Router();
 
 /* Add Workout (Protected) */
-router.post("/", verifyToken, addWorkout);
+router.post("/add", verifyToken, addWorkout);
 
 /* Get All Workouts (Protected) */
-router.get("/", verifyToken, getWorkouts);
+router.get("/user", verifyToken, getWorkouts);
 
 module.exports = router;
