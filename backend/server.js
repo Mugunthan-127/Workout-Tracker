@@ -5,6 +5,8 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
 const workoutRoutes = require("./routes/workouts");
+const analyticsRoutes = require("./routes/analytics");
+const goalRoutes = require("./routes/goals");
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.get("/", (req, res) => {
 /* Routes */
 app.use("/api/auth", authRoutes);
 app.use("/api/workouts", workoutRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/goals", goalRoutes);
 
 /* 404 Error Handler - Invalid Routes */
 app.use((req, res) => {
