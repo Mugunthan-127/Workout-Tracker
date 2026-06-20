@@ -1,10 +1,11 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const Workout = require("../models/Workout");
+const Goal = require("../models/Goal");
 const AppError = require("../utils/AppError");
-const asyncHandler = require("../utils/asyncHandler");
 
-exports.register = asyncHandler(async (req, res) => {
+exports.register = async (req, res) => {
     const { name, email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
@@ -22,9 +23,9 @@ exports.register = asyncHandler(async (req, res) => {
         message: "User registered successfully",
         user: { id: user._id, name: user.name, email: user.email }
     });
-});
+};
 
-exports.login = asyncHandler(async (req, res) => {
+exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -48,9 +49,9 @@ exports.login = asyncHandler(async (req, res) => {
         token,
         user: { id: user._id, name: user.name, email: user.email }
     });
-});
+};
 
-exports.getUser = asyncHandler(async (req, res) => {
+exports.getUser = async (req, res) => {
     const user = await User.findById(req.userId);
     if (!user) {
         throw new AppError("User not found", 404);
@@ -65,21 +66,24 @@ exports.getUser = asyncHandler(async (req, res) => {
             createdAt: user.createdAt
         }
     });
-});
+};
 
-exports.deleteUser = asyncHandler(async (req, res) => {
+exports.deleteUser = async (req, res) => {
     const user = await User.findByIdAndDelete(req.userId);
     if (!user) {
         throw new AppError("User not found", 404);
     }
 
+    await Workout.deleteMany({ user: req.userId });
+    await Goal.deleteMany({ user: req.userId });
+
     res.status(200).json({
         message: "User deleted successfully",
         user: { id: user._id, name: user.name, email: user.email }
     });
-});
+};
 
-exports.getAllUsers = asyncHandler(async (req, res) => {
+exports.getAllUsers = async (req, res) => {
     const users = await User.find({}).select("-password");
 
     res.status(200).json({
@@ -92,4 +96,4 @@ exports.getAllUsers = asyncHandler(async (req, res) => {
             createdAt: user.createdAt
         }))
     });
-});
+};

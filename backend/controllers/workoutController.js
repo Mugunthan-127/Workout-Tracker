@@ -1,8 +1,7 @@
 const Workout = require("../models/Workout");
 const AppError = require("../utils/AppError");
-const asyncHandler = require("../utils/asyncHandler");
 
-exports.addWorkout = asyncHandler(async (req, res) => {
+exports.addWorkout = async (req, res) => {
     const userId = req.userId;
     const { workoutType, notes, exercises } = req.body;
 
@@ -14,9 +13,9 @@ exports.addWorkout = asyncHandler(async (req, res) => {
         message: "Workout created successfully",
         workout,
     });
-});
+};
 
-exports.getWorkouts = asyncHandler(async (req, res) => {
+exports.getWorkouts = async (req, res) => {
     const userId = req.userId;
 
     const workouts = await Workout.find({ user: userId })
@@ -28,4 +27,4 @@ exports.getWorkouts = asyncHandler(async (req, res) => {
         totalWorkouts: workouts.length,
         workouts,
     });
-});
+};

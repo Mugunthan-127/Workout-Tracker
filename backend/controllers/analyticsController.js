@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 const Workout = require("../models/Workout");
-const asyncHandler = require("../utils/asyncHandler");
-
-exports.getDashboardAnalytics = asyncHandler(async (req, res) => {
+exports.getDashboardAnalytics = async (req, res) => {
     const userId = req.userId;
 
     const totalWorkouts = await Workout.countDocuments({ user: userId });
@@ -13,10 +11,16 @@ exports.getDashboardAnalytics = asyncHandler(async (req, res) => {
             $project: {
                 totalCalories: { $sum: "$exercises.calories" }
             }
+        },
+        {
+            $group: {
+                _id: null,
+                total: { $sum: "$totalCalories" }
+            }
         }
     ]);
 
-    const totalCalories = calorieData.length > 0 ? calorieData[0].totalCalories : 0;
+    const totalCalories = calorieData.length > 0 ? calorieData[0].total : 0;
 
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -35,9 +39,9 @@ exports.getDashboardAnalytics = asyncHandler(async (req, res) => {
             avgCaloriesPerWorkout: totalWorkouts > 0 ? Math.round(totalCalories / totalWorkouts) : 0
         }
     });
-});
+};
 
-exports.getWeeklyBreakdown = asyncHandler(async (req, res) => {
+exports.getWeeklyBreakdown = async (req, res) => {
     const userId = req.userId;
 
     const sevenDaysAgo = new Date();
@@ -64,9 +68,9 @@ exports.getWeeklyBreakdown = asyncHandler(async (req, res) => {
         message: "Weekly breakdown retrieved",
         weeklyData
     });
-});
+};
 
-exports.getWorkoutTypeDistribution = asyncHandler(async (req, res) => {
+exports.getWorkoutTypeDistribution = async (req, res) => {
     const userId = req.userId;
 
     const distribution = await Workout.aggregate([
@@ -85,9 +89,9 @@ exports.getWorkoutTypeDistribution = asyncHandler(async (req, res) => {
         message: "Workout type distribution retrieved",
         distribution
     });
-});
+};
 
-exports.getTopExercises = asyncHandler(async (req, res) => {
+exports.getTopExercises = async (req, res) => {
     const userId = req.userId;
 
     const topExercises = await Workout.aggregate([
@@ -110,4 +114,4 @@ exports.getTopExercises = asyncHandler(async (req, res) => {
         message: "Top exercises retrieved",
         topExercises
     });
-});
+};

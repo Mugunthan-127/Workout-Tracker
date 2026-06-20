@@ -2,9 +2,7 @@ const mongoose = require("mongoose");
 const Goal = require("../models/Goal");
 const Workout = require("../models/Workout");
 const AppError = require("../utils/AppError");
-const asyncHandler = require("../utils/asyncHandler");
-
-exports.createGoal = asyncHandler(async (req, res) => {
+exports.createGoal = async (req, res) => {
     const { goalType, targetValue, timeframe, exerciseName, workoutType } = req.body;
     const userId = req.userId;
 
@@ -25,9 +23,9 @@ exports.createGoal = asyncHandler(async (req, res) => {
         message: "Goal created successfully",
         goal: newGoal
     });
-});
+};
 
-exports.updateGoal = asyncHandler(async (req, res) => {
+exports.updateGoal = async (req, res) => {
     const { goalId } = req.params;
     const { targetValue, status } = req.body;
     const userId = req.userId;
@@ -51,9 +49,9 @@ exports.updateGoal = asyncHandler(async (req, res) => {
         message: "Goal updated successfully",
         goal
     });
-});
+};
 
-exports.getUserGoals = asyncHandler(async (req, res) => {
+exports.getUserGoals = async (req, res) => {
     const userId = req.userId;
 
     const goals = await Goal.find({ user: userId }).sort({ createdAt: -1 });
@@ -62,9 +60,9 @@ exports.getUserGoals = asyncHandler(async (req, res) => {
         message: "User goals retrieved",
         goals
     });
-});
+};
 
-exports.getGoalProgress = asyncHandler(async (req, res) => {
+exports.getGoalProgress = async (req, res) => {
     const { goalId } = req.params;
     const userId = req.userId;
 
@@ -134,9 +132,9 @@ exports.getGoalProgress = asyncHandler(async (req, res) => {
             timeframe: goal.timeframe
         }
     });
-});
+};
 
-exports.deleteGoal = asyncHandler(async (req, res) => {
+exports.deleteGoal = async (req, res) => {
     const { goalId } = req.params;
     const userId = req.userId;
 
@@ -151,8 +149,8 @@ exports.deleteGoal = asyncHandler(async (req, res) => {
 
     await Goal.deleteOne({ _id: goalId });
 
-    res.status(200).json({ message: "Goal deleted successfully" });
-});
+    res.status(200).json({ message: "Goal deleted successfully"     });
+};
 
 function calculateStartDate(timeframe) {
     const now = new Date();
