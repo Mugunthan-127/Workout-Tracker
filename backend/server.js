@@ -7,48 +7,32 @@ const authRoutes = require("./routes/auth");
 const workoutRoutes = require("./routes/workouts");
 const analyticsRoutes = require("./routes/analytics");
 const goalRoutes = require("./routes/goals");
+const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 
-/* Middleware */
 app.use(cors());
 app.use(express.json());
 
-/* Test Route */
 app.get("/", (req, res) => {
     res.send("Workout Tracker API Running");
 });
 
-/* Routes */
 app.use("/api/auth", authRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/goals", goalRoutes);
 
-/* 404 Error Handler - Invalid Routes */
 app.use((req, res) => {
-    res.status(404).json({ 
+    res.status(404).json({
         message: "Route not found",
         method: req.method,
         path: req.path,
-        availableEndpoints: {
-            GET: ["/", "/api/auth/user", "/api/auth/all-users"],
-            POST: ["/api/auth/register", "/api/auth/login"],
-            DELETE: ["/api/auth/user"]
-        }
     });
 });
 
-/* Global Error Handler */
-app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(err.status || 500).json({ 
-        message: err.message || "Internal Server Error",
-        error: process.env.NODE_ENV === "development" ? err : {}
-    });
-});
+app.use(errorHandler);
 
-/* MongoDB Connection */
 mongoose.connect(process.env.MONGO_URI)
 .then(() => {
     console.log("MongoDB Connected");
@@ -57,7 +41,6 @@ mongoose.connect(process.env.MONGO_URI)
     console.log(error);
 });
 
-/* Server */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

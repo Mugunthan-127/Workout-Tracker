@@ -1,22 +1,28 @@
 const express = require("express");
+const { body } = require("express-validator");
 const { register, login, getUser, deleteUser, getAllUsers } = require("../controllers/authController");
 const { verifyToken } = require("../middleware/auth");
+const validate = require("../middleware/validate");
 
 const router = express.Router();
 
-/* Register */
-router.post("/register", register);
+const registerValidation = [
+    body("name").trim().notEmpty().withMessage("Name is required"),
+    body("email").trim().isEmail().withMessage("Valid email is required"),
+    body("password")
+        .isLength({ min: 6 })
+        .withMessage("Password must be at least 6 characters"),
+];
 
-/* Login */
-router.post("/login", login);
+const loginValidation = [
+    body("email").trim().isEmail().withMessage("Valid email is required"),
+    body("password").notEmpty().withMessage("Password is required"),
+];
 
-/* Get User Details (Protected) */
+router.post("/register", registerValidation, validate, register);
+router.post("/login", loginValidation, validate, login);
 router.get("/user", verifyToken, getUser);
-
-/* Delete User (Protected) */
 router.delete("/user", verifyToken, deleteUser);
-
-/* Get All Users (Development Only) */
 router.get("/all-users", getAllUsers);
 
 module.exports = router;
